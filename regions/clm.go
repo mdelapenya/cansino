@@ -81,7 +81,13 @@ func clmProcessor(e *colly.HTMLElement) {
 				)
 				event.Description = strings.TrimSpace(string(descRunes[firstHyphen+1:]))
 			} else if index == 2 {
-				event.Location = li.Text
+				location := li.Text
+				arr := strings.Split(location, "Lugar:")
+				if len(arr) == 2 {
+					event.Location = strings.TrimSpace(arr[1])
+				} else {
+					event.Location = strings.TrimSpace(location)
+				}
 			} else if "ver-mas" == strings.TrimSpace(li.Attr("class")) {
 				li.ForEach("ul div div div p", func(_ int, p *colly.HTMLElement) {
 					html, err := p.DOM.Html()
