@@ -45,6 +45,11 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 	return err
 }
 
+// ToJSON exports the agenda to JSON
+func (a *Agenda) ToJSON() ([]byte, error) {
+	return json.Marshal(a)
+}
+
 // ToURL formats the URL
 func (a *Agenda) ToURL() string {
 	return fmt.Sprintf(a.URL, a.Date.Day, a.Date.Month, a.Date.Year)
