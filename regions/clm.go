@@ -47,7 +47,7 @@ func NewAgendaCLM(day int, month int, year int) *models.Agenda {
 		AllowedDomains: []string{"transparencia.castillalamancha.es"},
 		HTMLSelector:   cssSelector,
 		HTMLProcessor:  clmProcessor,
-		URL:            agendaURL,
+		URLFormat:      agendaURL,
 		Date:           agendaDate,
 		Events:         []models.AgendaEvent{},
 		Owner:          "Presidente",

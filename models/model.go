@@ -17,11 +17,14 @@ type Agenda struct {
 	HTMLSelector   string                     `yaml:"htmlSelector"`
 	HTMLProcessor  func(e *colly.HTMLElement) `json:"-"`
 	Owner          string                     `yaml:"owner"`
-	URL            string                     `yaml:"url"`
+	url            string                     `yaml:"url"`
+	URLFormat      string                     `yaml:"-"`
 }
 
 // Scrap scrappes an agenda
 func (a *Agenda) Scrap(ctx context.Context) error {
+	a.setURL()
+
 	// Instantiate default collector
 	c := colly.NewCollector(
 		colly.AllowedDomains(a.AllowedDomains...),
@@ -37,7 +40,7 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 	c.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting", r.URL.String())
 	})
-	err := c.Visit(a.ToURL())
+	err := c.Visit(a.url)
 	if err != nil {
 		println(err)
 	}
@@ -50,9 +53,8 @@ func (a *Agenda) ToJSON() ([]byte, error) {
 	return json.Marshal(a)
 }
 
-// ToURL formats the URL
-func (a *Agenda) ToURL() string {
-	return fmt.Sprintf(a.URL, a.Date.Day, a.Date.Month, a.Date.Year)
+func (a *Agenda) setURL() {
+	a.url = fmt.Sprintf(a.URLFormat, a.Date.Day, a.Date.Month, a.Date.Year)
 }
 
 // AgendaDate represents a day
