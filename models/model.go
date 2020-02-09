@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -10,13 +11,13 @@ import (
 
 // Agenda represents an agenda for a day
 type Agenda struct {
-	AllowedDomains []string      `yaml:"domains"`
-	Date           AgendaDate    `yaml:"day"`
-	Events         []AgendaEvent `yaml:"events"`
-	HTMLSelector   string        `yaml:"htmlSelector"`
-	HTMLProcessor  func(e *colly.HTMLElement)
-	Owner          string `yaml:"owner"`
-	URL            string `yaml:"url"`
+	AllowedDomains []string                   `yaml:"domains"`
+	Date           AgendaDate                 `yaml:"day"`
+	Events         []AgendaEvent              `yaml:"events"`
+	HTMLSelector   string                     `yaml:"htmlSelector"`
+	HTMLProcessor  func(e *colly.HTMLElement) `json:"-"`
+	Owner          string                     `yaml:"owner"`
+	URL            string                     `yaml:"url"`
 }
 
 // Scrap scrappes an agenda
