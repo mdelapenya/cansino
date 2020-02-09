@@ -31,18 +31,26 @@ var historicalEndDate = models.AgendaDate{
 var AgendaCLM *models.Agenda
 
 // NewAgendaCLM represents the agenda for Castilla-la Mancha
-func NewAgendaCLM() *models.Agenda {
+func NewAgendaCLM(day int, month int, year int) *models.Agenda {
+	agendaDate := models.AgendaDate{
+		Day: day, Month: month, Year: year,
+	}
+
+	agendaURL := pastEventsURL
+	cssSelector := "div.agenda-historico div div ul"
+	if agendaDate.ToDate().After(historicalEndDate.ToDate()) {
+		agendaURL = currentEventsURL
+		cssSelector = "div.view-agenda div div ul"
+	}
+
 	AgendaCLM = &models.Agenda{
 		AllowedDomains: []string{"transparencia.castillalamancha.es"},
-		HTMLSelector:   "div.agenda-historico div div ul",
+		HTMLSelector:   cssSelector,
 		HTMLProcessor:  clmProcessor,
-		URL:            pastEventsURL,
-		Date: models.AgendaDate{
-			// example date
-			Day: 1, Month: 7, Year: 2018,
-		},
-		Events: []models.AgendaEvent{},
-		Owner:  "Presidente",
+		URL:            agendaURL,
+		Date:           agendaDate,
+		Events:         []models.AgendaEvent{},
+		Owner:          "Presidente",
 	}
 
 	return AgendaCLM
