@@ -11,14 +11,14 @@ import (
 
 // Agenda represents an agenda for a day
 type Agenda struct {
-	AllowedDomains []string                   `yaml:"domains"`
-	Date           AgendaDate                 `yaml:"day"`
-	Events         []AgendaEvent              `yaml:"events"`
-	HTMLSelector   string                     `yaml:"htmlSelector"`
+	AllowedDomains []string                   `json:"-"`
+	Date           AgendaDate                 `json:"day"`
+	Events         []AgendaEvent              `json:"events"`
+	HTMLSelector   string                     `json:"-"`
 	HTMLProcessor  func(e *colly.HTMLElement) `json:"-"`
-	Owner          string                     `yaml:"owner"`
-	url            string                     `yaml:"url"`
-	URLFormat      string                     `yaml:"-"`
+	Owner          string                     `json:"owner"`
+	url            string                     `json:"url"`
+	URLFormat      string                     `json:"-"`
 }
 
 // Scrap scrappes an agenda
@@ -59,9 +59,9 @@ func (a *Agenda) setURL() {
 
 // AgendaDate represents a day
 type AgendaDate struct {
-	Day   int `yaml:"day"`
-	Month int `yaml:"month"`
-	Year  int `yaml:"year"`
+	Day   int `json:"day"`
+	Month int `json:"month"`
+	Year  int `json:"year"`
 }
 
 //ToDate converts a date into time.Time
@@ -71,14 +71,14 @@ func (ad *AgendaDate) ToDate() time.Time {
 
 // AgendaEvent represents an event in the agenda
 type AgendaEvent struct {
-	Date        time.Time  `yaml:"date"`
-	Description string     `yaml:"description"`
-	Location    string     `yaml:"location"`
-	Attendance  []Attendee `yaml:"attendance"`
+	Date        time.Time  `json:"date"`
+	Description string     `json:"description"`
+	Location    string     `json:"location"`
+	Attendance  []Attendee `json:"attendance"`
 }
 
 // Attendee represents a person attending an event
 type Attendee struct {
-	Job      string `yaml:"job"`
-	FullName string `yaml:"fullName"`
+	Job      string `json:"job"`
+	FullName string `json:"fullName"`
 }
