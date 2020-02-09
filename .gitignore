@@ -5,6 +5,7 @@
 *.so
 *.dylib
 
+.cansino_cache
 cansino
 
 # Test binary, built with `go test -c`
