@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	indexers "github.com/mdelapenya/cansino/indexers"
 	regions "github.com/mdelapenya/cansino/regions"
 )
 
@@ -14,13 +15,12 @@ func main() {
 
 	clm.Scrap(context.Background())
 
-	json, err := clm.ToJSON()
+	indexer, _ := indexers.GetIndexer("elasticsearch")
+	err := indexer.Index(context.Background(), *clm)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-
-	fmt.Println(string(json))
 }
 
 // Scrapper methods required to scrap a site
