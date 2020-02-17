@@ -43,14 +43,20 @@ func NewAgendaCLM(day int, month int, year int) *models.Agenda {
 		cssSelector = "div.view-agenda div div ul"
 	}
 
+	loc, _ := time.LoadLocation("Europe/Madrid")
+
 	AgendaCLM = &models.Agenda{
 		AllowedDomains: []string{"transparencia.castillalamancha.es"},
 		HTMLSelector:   cssSelector,
 		HTMLProcessor:  clmProcessor,
 		URLFormat:      agendaURL,
-		Date:           agendaDate,
-		Events:         []models.AgendaEvent{},
-		Owner:          "Presidente",
+		Date: time.Date(
+			agendaDate.Year, time.Month(agendaDate.Month), agendaDate.Day,
+			0, 0, 0, 0, loc,
+		),
+		Day:    agendaDate,
+		Events: []models.AgendaEvent{},
+		Owner:  "Presidente",
 	}
 
 	return AgendaCLM
@@ -84,7 +90,7 @@ func clmProcessor(e *colly.HTMLElement) {
 				loc, _ := time.LoadLocation("Europe/Madrid")
 
 				event.Date = time.Date(
-					AgendaCLM.Date.Year, AgendaCLM.Date.ToDate().Month(), AgendaCLM.Date.Day,
+					AgendaCLM.Day.Year, AgendaCLM.Day.ToDate().Month(), AgendaCLM.Day.Day,
 					hour, min, 0, 0, loc,
 				)
 				event.Description = strings.TrimSpace(string(descRunes[firstHyphen+1:]))

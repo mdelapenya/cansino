@@ -12,12 +12,13 @@ import (
 // Agenda represents an agenda for a day
 type Agenda struct {
 	AllowedDomains []string                   `json:"-"`
-	Date           AgendaDate                 `json:"day"`
+	Date           time.Time                  `json:"date"`
+	Day            AgendaDate                 `json:"day"`
 	Events         []AgendaEvent              `json:"events"`
 	HTMLSelector   string                     `json:"-"`
 	HTMLProcessor  func(e *colly.HTMLElement) `json:"-"`
 	Owner          string                     `json:"owner"`
-	url            string                     `json:"url"`
+	URL            string                     `json:"url"`
 	URLFormat      string                     `json:"-"`
 }
 
@@ -40,7 +41,7 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 	c.OnRequest(func(r *colly.Request) {
 		fmt.Println("Visiting", r.URL.String())
 	})
-	err := c.Visit(a.url)
+	err := c.Visit(a.URL)
 	if err != nil {
 		println(err)
 	}
@@ -54,7 +55,7 @@ func (a *Agenda) ToJSON() ([]byte, error) {
 }
 
 func (a *Agenda) setURL() {
-	a.url = fmt.Sprintf(a.URLFormat, a.Date.Day, a.Date.Month, a.Date.Year)
+	a.URL = fmt.Sprintf(a.URLFormat, a.Day.Day, a.Day.Month, a.Day.Year)
 }
 
 // AgendaDate represents a day
