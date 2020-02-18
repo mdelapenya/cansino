@@ -120,9 +120,16 @@ func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
 							continue
 						}
 						line := strings.Split(a, " - ")
-						attendee := models.Attendee{
-							Job:      line[0],
-							FullName: line[1],
+						var attendee models.Attendee
+						if len(line) == 2 {
+							attendee = models.Attendee{
+								Job:      line[0],
+								FullName: line[1],
+							}
+						} else {
+							attendee = models.Attendee{
+								Job: line[0],
+							}
 						}
 						event.Attendance = append(event.Attendance, attendee)
 					}
