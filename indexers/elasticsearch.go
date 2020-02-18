@@ -27,8 +27,8 @@ func NewESIndexer() Indexer {
 }
 
 // Index indexes an agenda in Elasticsearch
-func (ei *ElasticsearchIndexer) Index(ctx context.Context, agenda models.Agenda) error {
-	agendaJSON, err := agenda.ToJSON()
+func (ei *ElasticsearchIndexer) Index(ctx context.Context, event models.AgendaEvent) error {
+	eventJSON, err := event.ToJSON()
 	if err != nil {
 		return err
 	}
@@ -41,8 +41,8 @@ func (ei *ElasticsearchIndexer) Index(ctx context.Context, agenda models.Agenda)
 	// Set up the request object.
 	req := esapi.IndexRequest{
 		Index:      "cansino",
-		DocumentID: agenda.ID,
-		Body:       strings.NewReader(string(agendaJSON)),
+		DocumentID: event.ID,
+		Body:       strings.NewReader(string(eventJSON)),
 		Refresh:    "true",
 	}
 
@@ -54,7 +54,7 @@ func (ei *ElasticsearchIndexer) Index(ctx context.Context, agenda models.Agenda)
 	defer res.Body.Close()
 
 	if res.IsError() {
-		log.Printf("[%s] Error indexing document ID=%s", res.Status(), agenda.ID)
+		log.Printf("[%s] Error indexing document ID=%s", res.Status(), event.ID)
 	} else {
 		// Deserialize the response into a map.
 		var r map[string]interface{}

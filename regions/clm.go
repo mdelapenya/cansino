@@ -82,10 +82,12 @@ func ProcessCLM(ctx context.Context) error {
 		clm.Scrap(context.Background())
 
 		indexer, _ := indexers.GetIndexer("elasticsearch")
-		err := indexer.Index(context.Background(), *clm)
-		if err != nil {
-			fmt.Errorf("error indexing agenda: %v", err)
-			return err
+		for _, event := range clm.Events {
+			err := indexer.Index(context.Background(), event)
+			if err != nil {
+				fmt.Errorf("error indexing event: %v", err)
+				return err
+			}
 		}
 	}
 
@@ -99,6 +101,7 @@ func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
 			if "cargo" == strings.TrimSpace(li.Attr("class")) {
 				event = models.AgendaEvent{
 					Attendance: []models.Attendee{},
+					Owner:      a.Owner,
 				}
 			} else if index == 1 {
 				description := li.Text
@@ -162,6 +165,7 @@ func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
 				// discard LI
 			}
 		})
+		event.ID = event.Date.Local().Format("2006-01-02T15:04:05-0700")
 		a.Events = append(a.Events, event)
 	}
 }

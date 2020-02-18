@@ -7,50 +7,26 @@
             "date" : {
                 "type" : "date"
             },
-            "day" : {
+            "description" : {
+                "type" : "text"
+            },
+            "location" : {
+                "type" : "text"
+            },
+            "attendance" : {
+                "type": "nested",
                 "properties" : {
-                    "day" : {
-                        "type" : "short"
+                    "job" : {
+                        "type" : "text"
                     },
-                    "month" : {
-                        "type" : "short"
-                    },
-                    "year" : {
-                        "type" : "short"
+                    "fullName" : {
+                        "type" : "text"
                     }
                 }
             },
             "owner" : {
                 "type" : "keyword"
-            },
-            "url" : {
-                "type" : "keyword"
-            },
-            "events" : {
-                "type": "nested",
-                "properties" : {
-                    "date" : {
-                        "type" : "date"
-                    },
-                    "description" : {
-                        "type" : "text"
-                    },
-                    "location" : {
-                        "type" : "text"
-                    },
-                    "attendance" : {
-                        "type": "nested",
-                        "properties" : {
-                            "job" : {
-                                "type" : "text"
-                            },
-                            "fullName" : {
-                                "type" : "text"
-                            }
-                        }
-                    }
-                }
-            }   
+            }
         }
     }
 }
