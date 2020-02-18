@@ -1,6 +1,7 @@
 package clm
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -60,6 +61,7 @@ func NewAgendaCLM(day int, month int, year int) *models.Agenda {
 		Events:         []models.AgendaEvent{},
 		ID:             dateTime.Local().Format("2006-01-02"),
 		Owner:          "Presidente",
+		URL:            fmt.Sprintf(agendaURL, agendaDate.Day, agendaDate.Month, agendaDate.Year),
 	}
 
 	return AgendaCLM

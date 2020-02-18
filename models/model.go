@@ -25,8 +25,6 @@ type Agenda struct {
 
 // Scrap scrappes an agenda
 func (a *Agenda) Scrap(ctx context.Context) error {
-	a.setURL()
-
 	// Instantiate default collector
 	c := colly.NewCollector(
 		colly.AllowedDomains(a.AllowedDomains...),
@@ -53,10 +51,6 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 // ToJSON exports the agenda to JSON
 func (a *Agenda) ToJSON() ([]byte, error) {
 	return json.Marshal(a)
-}
-
-func (a *Agenda) setURL() {
-	a.URL = fmt.Sprintf(a.URLFormat, a.Day.Day, a.Day.Month, a.Day.Year)
 }
 
 // AgendaDate represents a day
