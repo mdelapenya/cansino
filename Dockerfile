@@ -4,7 +4,7 @@
 FROM golang:alpine AS builder
 # Install git.
 # Git is required for fetching the dependencies.
-RUN apk update && apk add --no-cache git tzdata
+RUN apk update && apk add --no-cache ca-certificates git tzdata
 WORKDIR $GOPATH/src/github.com/gdgtoledo/cansino
 
 COPY . .
@@ -17,6 +17,8 @@ RUN GOOS=linux GOARCH=386 go build -ldflags="-w -s" -o /go/bin/cansino
 FROM scratch
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 ENV TZ=Europe/Madrid
+# Copy default certificates
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 # Copy our static executable.
 COPY --from=builder /go/bin/cansino /go/bin/cansino
 # Run the cansino binary.
