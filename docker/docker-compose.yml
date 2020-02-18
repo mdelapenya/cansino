@@ -1,0 +1,8 @@
+version: "3.7"
+services:
+  cansino:
+    build: ../
+    image: gdgtoledo/cansino:1.0.0
+    container_name: cansino
+    env_file:
+     - .env
