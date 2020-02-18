@@ -1,4 +1,4 @@
-package clm
+package regions
 
 import (
 	"context"
