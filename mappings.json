@@ -8,16 +8,19 @@
                 "type" : "date"
             },
             "description" : {
-                "type" : "text"
+                "type" : "text",
+                "fielddata": true
             },
             "location" : {
-                "type" : "text"
+                "type" : "text",
+                "fielddata": true
             },
             "attendance" : {
                 "type": "nested",
                 "properties" : {
                     "job" : {
-                        "type" : "text"
+                        "type" : "text",
+                        "fielddata": true
                     },
                     "fullName" : {
                         "type" : "text"
