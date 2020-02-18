@@ -17,6 +17,7 @@ type Agenda struct {
 	Events         []AgendaEvent              `json:"events"`
 	HTMLSelector   string                     `json:"-"`
 	HTMLProcessor  func(e *colly.HTMLElement) `json:"-"`
+	ID             string                     `json:"id"`
 	Owner          string                     `json:"owner"`
 	URL            string                     `json:"url"`
 	URLFormat      string                     `json:"-"`
@@ -43,7 +44,7 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 	})
 	err := c.Visit(a.URL)
 	if err != nil {
-		println(err)
+		fmt.Errorf("Error visiting URL [%s]: %v", a.URL, err)
 	}
 
 	return err

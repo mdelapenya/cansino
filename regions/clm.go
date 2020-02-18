@@ -45,18 +45,21 @@ func NewAgendaCLM(day int, month int, year int) *models.Agenda {
 
 	loc, _ := time.LoadLocation("Europe/Madrid")
 
+	dateTime := time.Date(
+		agendaDate.Year, time.Month(agendaDate.Month), agendaDate.Day,
+		0, 0, 0, 0, loc,
+	)
+
 	AgendaCLM = &models.Agenda{
 		AllowedDomains: []string{"transparencia.castillalamancha.es"},
 		HTMLSelector:   cssSelector,
 		HTMLProcessor:  clmProcessor,
 		URLFormat:      agendaURL,
-		Date: time.Date(
-			agendaDate.Year, time.Month(agendaDate.Month), agendaDate.Day,
-			0, 0, 0, 0, loc,
-		),
-		Day:    agendaDate,
-		Events: []models.AgendaEvent{},
-		Owner:  "Presidente",
+		Date:           dateTime,
+		Day:            agendaDate,
+		Events:         []models.AgendaEvent{},
+		ID:             dateTime.Local().Format("2006-01-02"),
+		Owner:          "Presidente",
 	}
 
 	return AgendaCLM
