@@ -4,19 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	indexers "github.com/mdelapenya/cansino/indexers"
 	regions "github.com/mdelapenya/cansino/regions"
 )
 
 func main() {
 	fmt.Println("Soy un cansino!")
 
-	clm := regions.NewAgendaCLM(7, 2, 2020)
-
-	clm.Scrap(context.Background())
-
-	indexer, _ := indexers.GetIndexer("elasticsearch")
-	err := indexer.Index(context.Background(), *clm)
+	err := regions.ProcessCLM(context.Background())
 	if err != nil {
 		fmt.Println(err)
 		return

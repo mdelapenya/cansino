@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gocolly/colly"
+	"github.com/mdelapenya/cansino/indexers"
 	models "github.com/mdelapenya/cansino/models"
 )
 
@@ -29,9 +30,6 @@ var historicalEndDate = models.AgendaDate{
 	Day: 7, Month: 7, Year: 2019,
 }
 
-// AgendaCLM holds the data for CLM's agenda
-var AgendaCLM *models.Agenda
-
 // NewAgendaCLM represents the agenda for Castilla-la Mancha
 func NewAgendaCLM(day int, month int, year int) *models.Agenda {
 	agendaDate := models.AgendaDate{
@@ -52,7 +50,7 @@ func NewAgendaCLM(day int, month int, year int) *models.Agenda {
 		0, 0, 0, 0, loc,
 	)
 
-	AgendaCLM = &models.Agenda{
+	agendaCLM := &models.Agenda{
 		AllowedDomains: []string{"transparencia.castillalamancha.es"},
 		HTMLSelector:   cssSelector,
 		HTMLProcessor:  clmProcessor,
@@ -65,7 +63,33 @@ func NewAgendaCLM(day int, month int, year int) *models.Agenda {
 		URL:            fmt.Sprintf(agendaURL, agendaDate.Day, agendaDate.Month, agendaDate.Year),
 	}
 
-	return AgendaCLM
+	return agendaCLM
+}
+
+// ProcessCLM processes all entities from the beginning to the end
+func ProcessCLM(ctx context.Context) error {
+	start := historicalStartDate.ToDate()
+	end := time.Now()
+
+	for rd := rangeDate(start, end); ; {
+		date := rd()
+		if date.IsZero() {
+			break
+		}
+
+		clm := NewAgendaCLM(date.Day(), int(date.Month()), date.Year())
+
+		clm.Scrap(context.Background())
+
+		indexer, _ := indexers.GetIndexer("elasticsearch")
+		err := indexer.Index(context.Background(), *clm)
+		if err != nil {
+			fmt.Errorf("error indexing agenda: %v", err)
+			return err
+		}
+	}
+
+	return nil
 }
 
 func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
