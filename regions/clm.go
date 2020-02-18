@@ -1,6 +1,7 @@
 package clm
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -67,7 +68,7 @@ func NewAgendaCLM(day int, month int, year int) *models.Agenda {
 	return AgendaCLM
 }
 
-func clmProcessor(e *colly.HTMLElement) {
+func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
 	if clmClass == strings.TrimSpace(e.Attr("class")) {
 		var event models.AgendaEvent
 		e.ForEach("li", func(index int, li *colly.HTMLElement) {
@@ -95,7 +96,7 @@ func clmProcessor(e *colly.HTMLElement) {
 				loc, _ := time.LoadLocation("Europe/Madrid")
 
 				event.Date = time.Date(
-					AgendaCLM.Day.Year, AgendaCLM.Day.ToDate().Month(), AgendaCLM.Day.Day,
+					a.Day.Year, a.Day.ToDate().Month(), a.Day.Day,
 					hour, min, 0, 0, loc,
 				)
 				event.Description = strings.TrimSpace(string(descRunes[firstHyphen+1:]))
@@ -130,6 +131,6 @@ func clmProcessor(e *colly.HTMLElement) {
 				// discard LI
 			}
 		})
-		AgendaCLM.Events = append(AgendaCLM.Events, event)
+		a.Events = append(a.Events, event)
 	}
 }

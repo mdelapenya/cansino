@@ -11,16 +11,16 @@ import (
 
 // Agenda represents an agenda for a day
 type Agenda struct {
-	AllowedDomains []string                   `json:"-"`
-	Date           time.Time                  `json:"date"`
-	Day            AgendaDate                 `json:"day"`
-	Events         []AgendaEvent              `json:"events"`
-	HTMLSelector   string                     `json:"-"`
-	HTMLProcessor  func(e *colly.HTMLElement) `json:"-"`
-	ID             string                     `json:"id"`
-	Owner          string                     `json:"owner"`
-	URL            string                     `json:"url"`
-	URLFormat      string                     `json:"-"`
+	AllowedDomains []string                              `json:"-"`
+	Date           time.Time                             `json:"date"`
+	Day            AgendaDate                            `json:"day"`
+	Events         []AgendaEvent                         `json:"events"`
+	HTMLSelector   string                                `json:"-"`
+	HTMLProcessor  func(a *Agenda, e *colly.HTMLElement) `json:"-"`
+	ID             string                                `json:"id"`
+	Owner          string                                `json:"owner"`
+	URL            string                                `json:"url"`
+	URLFormat      string                                `json:"-"`
 }
 
 // Scrap scrappes an agenda
@@ -34,7 +34,7 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 		colly.CacheDir("./.cansino_cache"),
 	)
 
-	c.OnHTML(a.HTMLSelector, a.HTMLProcessor)
+	c.OnHTML(a.HTMLSelector, a.process)
 
 	// Before making a request print "Visiting ..."
 	c.OnRequest(func(r *colly.Request) {
@@ -51,6 +51,10 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 // ToJSON exports the agenda to JSON
 func (a *Agenda) ToJSON() ([]byte, error) {
 	return json.Marshal(a)
+}
+
+func (a *Agenda) process(e *colly.HTMLElement) {
+	a.HTMLProcessor(a, e)
 }
 
 // AgendaDate represents a day
