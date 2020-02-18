@@ -1,0 +1,56 @@
+{
+    "mappings": {
+        "properties": {
+            "id" : {
+                "type" : "keyword"
+            },
+            "date" : {
+                "type" : "date"
+            },
+            "day" : {
+                "properties" : {
+                    "day" : {
+                        "type" : "short"
+                    },
+                    "month" : {
+                        "type" : "short"
+                    },
+                    "year" : {
+                        "type" : "short"
+                    }
+                }
+            },
+            "owner" : {
+                "type" : "keyword"
+            },
+            "url" : {
+                "type" : "keyword"
+            },
+            "events" : {
+                "type": "nested",
+                "properties" : {
+                    "date" : {
+                        "type" : "date"
+                    },
+                    "description" : {
+                        "type" : "text"
+                    },
+                    "location" : {
+                        "type" : "text"
+                    },
+                    "attendance" : {
+                        "type": "nested",
+                        "properties" : {
+                            "job" : {
+                                "type" : "text"
+                            },
+                            "fullName" : {
+                                "type" : "text"
+                            }
+                        }
+                    }
+                }
+            }   
+        }
+    }
+}
