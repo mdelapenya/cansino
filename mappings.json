@@ -1,4 +1,14 @@
 {
+    "settings": {
+        "analysis": {
+            "filter": {
+                "spanish_stop": {
+                    "type": "stop",
+                    "stopwords": "_spanish_"
+                }
+            }
+        }
+    },
     "mappings": {
         "properties": {
             "id" : {
