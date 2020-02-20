@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
-	"github.com/gocolly/colly"
+	"github.com/gocolly/colly/v2"
+	"go.elastic.co/apm/module/apmhttp"
 )
 
 // Agenda represents an agenda for a day
@@ -33,6 +35,10 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 		// even if the collector is restarted
 		colly.CacheDir("./.cansino_cache"),
 	)
+
+	// instrument Colly's HTTP requests with APM Agent Go
+	apmHTTPClient := apmhttp.WrapClient(http.DefaultClient)
+	c.SetClient(apmHTTPClient)
 
 	c.OnHTML(a.HTMLSelector, a.process)
 
