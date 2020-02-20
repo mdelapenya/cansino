@@ -34,6 +34,9 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 		// Cache responses to prevent multiple download of pages
 		// even if the collector is restarted
 		colly.CacheDir("./.cansino_cache"),
+		// MaxDepth is 1, so only the links on the scraped page
+		// is visited, and no further links are followed
+		colly.MaxDepth(1),
 	)
 
 	// instrument Colly's HTTP requests with APM Agent Go
@@ -44,8 +47,15 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 
 	// Before making a request print "Visiting ..."
 	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("Visiting", r.URL.String())
+		r.Ctx.Put("url", r.URL.String())
+		fmt.Printf("Visiting %s\n", r.URL.String())
 	})
+
+	// Set error handler
+	c.OnError(func(r *colly.Response, err error) {
+		fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
+	})
+
 	err := c.Visit(a.URL)
 	if err != nil {
 		fmt.Errorf("Error visiting URL [%s]: %v", a.URL, err)
