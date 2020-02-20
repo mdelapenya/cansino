@@ -12,6 +12,7 @@ import (
 	esapi "github.com/elastic/go-elasticsearch/v7/esapi"
 	models "github.com/mdelapenya/cansino/models"
 	log "github.com/sirupsen/logrus"
+	apm "go.elastic.co/apm"
 	apmes "go.elastic.co/apm/module/apmelasticsearch"
 )
 
@@ -38,6 +39,15 @@ func (ei *ElasticsearchIndexer) Index(ctx context.Context, event models.AgendaEv
 		return err
 	}
 
+	// Set up the APM transaction
+	txn := apm.DefaultTracer.StartTransaction("Index()", "indexing")
+	// Add current user to the transaction metadata
+	txn.Context.SetUsername("cansino")
+	// Store the transaction in a context
+	txCtx := apm.ContextWithTransaction(ctx, txn)
+	// Mark the transaction as completed
+	defer txn.End()
+
 	// Set up the request object.
 	req := esapi.IndexRequest{
 		Index:      "cansino",
@@ -47,8 +57,11 @@ func (ei *ElasticsearchIndexer) Index(ctx context.Context, event models.AgendaEv
 	}
 
 	// Perform the request with the client.
-	res, err := req.Do(context.Background(), esClient)
+	res, err := req.Do(txCtx, esClient)
 	if err != nil {
+		// Capture the error
+		apm.CaptureError(txCtx, err).Send()
+
 		log.Fatalf("Error getting response: %s", err)
 	}
 	defer res.Body.Close()
@@ -59,8 +72,13 @@ func (ei *ElasticsearchIndexer) Index(ctx context.Context, event models.AgendaEv
 		// Deserialize the response into a map.
 		var r map[string]interface{}
 		if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
+			// Capture the error
+			apm.CaptureError(txCtx, err).Send()
 			log.Printf("Error parsing the response body: %s", err)
 		} else {
+			// Set the response status as transaction result
+			txn.Result = res.Status()
+
 			// Print the response status and indexed document version.
 			fmt.Printf("[%s] %s; version=%d", res.Status(), r["result"], int(r["_version"].(float64)))
 		}
