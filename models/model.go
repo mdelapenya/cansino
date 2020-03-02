@@ -95,6 +95,7 @@ type AgendaEvent struct {
 	OriginalLocation    string     `json:"originalLocation"`
 	Attendance          []Attendee `json:"attendance"`
 	Owner               string     `json:"owner"`
+	Region              string     `json:"region"`
 }
 
 // ToJSON exports the event to JSON

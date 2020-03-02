@@ -102,6 +102,7 @@ func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
 				event = models.AgendaEvent{
 					Attendance: []models.Attendee{},
 					Owner:      a.Owner,
+					Region:     "Castilla-La Mancha",
 				}
 			} else if index == 1 {
 				description := li.Text

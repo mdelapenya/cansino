@@ -45,6 +45,9 @@
             },
             "owner" : {
                 "type" : "keyword"
+            },
+            "region" : {
+                "type" : "keyword"
             }
         }
     }
