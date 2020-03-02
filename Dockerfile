@@ -10,7 +10,7 @@ WORKDIR $GOPATH/src/github.com/gdgtoledo/cansino
 COPY . .
 
 # Build the binary.
-RUN GOOS=linux GOARCH=386 go build -ldflags="-w -s" -o /go/bin/cansino
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/cansino
 ############################
 # STEP 2 build a small image
 ############################
