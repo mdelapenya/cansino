@@ -87,12 +87,14 @@ func (ad *AgendaDate) ToDate() time.Time {
 
 // AgendaEvent represents an event in the agenda
 type AgendaEvent struct {
-	Date        time.Time  `json:"date"`
-	Description string     `json:"description"`
-	ID          string     `json:"id"`
-	Location    string     `json:"location"`
-	Attendance  []Attendee `json:"attendance"`
-	Owner       string     `json:"owner"`
+	Date                time.Time  `json:"date"`
+	Description         string     `json:"description"`
+	OriginalDescription string     `json:"originalDescription"`
+	ID                  string     `json:"id"`
+	Location            string     `json:"location"`
+	OriginalLocation    string     `json:"originalLocation"`
+	Attendance          []Attendee `json:"attendance"`
+	Owner               string     `json:"owner"`
 }
 
 // ToJSON exports the event to JSON

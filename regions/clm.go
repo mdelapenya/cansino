@@ -127,6 +127,7 @@ func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
 					hour, min, 0, 0, loc,
 				)
 				event.Description = strings.TrimSpace(string(descRunes[firstHyphen+1:]))
+				event.OriginalDescription = event.Description
 			} else if index == 2 {
 				location := li.Text
 				arr := strings.Split(location, "Lugar:")
@@ -135,6 +136,7 @@ func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
 				} else {
 					event.Location = strings.TrimSpace(location)
 				}
+				event.OriginalLocation = event.Location
 			} else if "ver-mas" == strings.TrimSpace(li.Attr("class")) {
 				li.ForEach("ul div div div p", func(_ int, p *colly.HTMLElement) {
 					html, err := p.DOM.Html()

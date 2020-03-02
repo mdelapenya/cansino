@@ -21,9 +21,15 @@
                 "type" : "text",
                 "fielddata": true
             },
+            "originalDescription" : {
+                "type" : "keyword"
+            },
             "location" : {
                 "type" : "text",
                 "fielddata": true
+            },
+            "originalLocation" : {
+                "type" : "keyword"
             },
             "attendance" : {
                 "type": "nested",
