@@ -149,7 +149,7 @@ func (ei *ElasticsearchIndexer) Index(ctx context.Context, event models.AgendaEv
 			txn.Result = res.Status()
 
 			// Print the response status and indexed document version.
-			fmt.Printf("[%s] %s; version=%d", res.Status(), r["result"], int(r["_version"].(float64)))
+			fmt.Printf("[%s] %s; version=%d\n", res.Status(), r["result"], int(r["_version"].(float64)))
 		}
 	}
 
