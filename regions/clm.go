@@ -79,15 +79,21 @@ func ProcessCLM(ctx context.Context) error {
 
 		clm := NewAgendaCLM(date.Day(), int(date.Month()), date.Year())
 
-		clm.Scrap(context.Background())
+		processAgenda(context.Background(), clm)
+	}
 
-		indexer, _ := indexers.GetIndexer("elasticsearch")
-		for _, event := range clm.Events {
-			err := indexer.Index(context.Background(), event)
-			if err != nil {
-				fmt.Errorf("error indexing event: %v", err)
-				return err
-			}
+	return nil
+}
+
+func processAgenda(ctx context.Context, a *models.Agenda) error {
+	a.Scrap(context.Background())
+
+	indexer, _ := indexers.GetIndexer("elasticsearch")
+	for _, event := range a.Events {
+		err := indexer.Index(context.Background(), event)
+		if err != nil {
+			fmt.Errorf("error indexing event: %v", err)
+			return err
 		}
 	}
 
