@@ -3,11 +3,11 @@ package models
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gocolly/colly/v2"
+	log "github.com/sirupsen/logrus"
 	"go.elastic.co/apm/module/apmhttp"
 )
 
@@ -48,17 +48,26 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 	// Before making a request print "Visiting ..."
 	c.OnRequest(func(r *colly.Request) {
 		r.Ctx.Put("url", r.URL.String())
-		fmt.Printf("Visiting %s\n", r.URL.String())
+		log.WithFields(log.Fields{
+			"url": r.URL.String(),
+		}).Debug("Visiting url")
 	})
 
 	// Set error handler
 	c.OnError(func(r *colly.Response, err error) {
-		fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
+		log.WithFields(log.Fields{
+			"url":      r.Request.URL,
+			"response": r,
+			"error":    err,
+		}).Error("Failed to parse HTML")
 	})
 
 	err := c.Visit(a.URL)
 	if err != nil {
-		fmt.Errorf("Error visiting URL [%s]: %v", a.URL, err)
+		log.WithFields(log.Fields{
+			"url":   a.URL,
+			"error": err,
+		}).Error("Error visiting URL")
 	}
 
 	return err

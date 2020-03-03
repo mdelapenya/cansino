@@ -10,6 +10,7 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/mdelapenya/cansino/indexers"
 	models "github.com/mdelapenya/cansino/models"
+	log "github.com/sirupsen/logrus"
 )
 
 const clmClass = "agenda evento"
@@ -92,7 +93,11 @@ func processAgenda(ctx context.Context, a *models.Agenda) error {
 	for _, event := range a.Events {
 		err := indexer.Index(context.Background(), event)
 		if err != nil {
-			fmt.Errorf("error indexing event: %v", err)
+			log.WithFields(log.Fields{
+				"agendaID": a.ID,
+				"date":     a.Date,
+				"error":    err,
+			}).Errorf("error indexing event")
 			return err
 		}
 	}

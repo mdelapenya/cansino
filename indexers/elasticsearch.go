@@ -3,7 +3,6 @@ package indexers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -53,16 +52,20 @@ func analyze(ctx context.Context, text string) ([]string, error) {
 	// Mark the transaction as completed
 	defer analyzeTxn.End()
 
+	body := getBody(text)
 	// Perform the analyze request with the client.
 	analyzeRes, err := esClient.Indices.Analyze(
 		esClient.Indices.Analyze.WithIndex("cansino"),
-		esClient.Indices.Analyze.WithBody(
-			strings.NewReader(getBody(text))),
+		esClient.Indices.Analyze.WithBody(strings.NewReader(body)),
 		esClient.Indices.Analyze.WithPretty(),
 		esClient.Indices.Analyze.WithContext(analyzeTxCtx),
 	)
 	if err != nil {
-		log.Printf("Error getting analyze response: %s\n", err)
+		log.WithFields(log.Fields{
+			"index": "cansino",
+			"body":  body,
+			"error": err,
+		}).Error("Error getting analyze response")
 		return []string{}, err
 	}
 	defer analyzeRes.Body.Close()
@@ -72,7 +75,11 @@ func analyze(ctx context.Context, text string) ([]string, error) {
 	if err := json.NewDecoder(analyzeRes.Body).Decode(&r); err != nil {
 		// Capture the error
 		apm.CaptureError(analyzeTxCtx, err).Send()
-		log.Printf("Error parsing the analyze response body %v: %s\n", analyzeRes.Body, err)
+		log.WithFields(log.Fields{
+			"body":    body,
+			"reqBody": analyzeRes.Body,
+			"error":   err,
+		}).Error("Error parsing the analyze response body")
 		return []string{}, err
 	}
 
@@ -117,11 +124,13 @@ func (ei *ElasticsearchIndexer) Index(ctx context.Context, event models.AgendaEv
 		return err
 	}
 
+	stringJSON := string(eventJSON)
+
 	// Set up the request object.
 	req := esapi.IndexRequest{
 		Index:      "cansino",
 		DocumentID: event.ID,
-		Body:       strings.NewReader(string(eventJSON)),
+		Body:       strings.NewReader(stringJSON),
 		Refresh:    "true",
 	}
 
@@ -131,25 +140,41 @@ func (ei *ElasticsearchIndexer) Index(ctx context.Context, event models.AgendaEv
 		// Capture the error
 		apm.CaptureError(txCtx, err).Send()
 
-		log.Fatalf("Error getting response: %s", err)
+		log.WithFields(log.Fields{
+			"index":      "cansino",
+			"documentID": event.ID,
+			"json":       stringJSON,
+			"error":      err,
+		}).Error("Error getting response")
 	}
 	defer res.Body.Close()
 
 	if res.IsError() {
-		log.Printf("[%s] Error indexing document ID=%s", res.Status(), event.ID)
+		log.WithFields(log.Fields{
+			"status":     res.Status(),
+			"documentID": event.ID,
+		}).Error("Error indexing document")
 	} else {
 		// Deserialize the response into a map.
 		var r map[string]interface{}
 		if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
 			// Capture the error
 			apm.CaptureError(txCtx, err).Send()
-			log.Printf("Error parsing the response body: %s", err)
+			log.WithFields(log.Fields{
+				"error": err,
+				"body":  res.Body,
+			}).Error("Error parsing the response body")
 		} else {
 			// Set the response status as transaction result
 			txn.Result = res.Status()
 
 			// Print the response status and indexed document version.
-			fmt.Printf("[%s] %s; version=%d\n", res.Status(), r["result"], int(r["_version"].(float64)))
+			log.WithFields(log.Fields{
+				"status":     res.Status(),
+				"documentID": event.ID,
+				"result":     r["result"],
+				"version":    int(r["_version"].(float64)),
+			}).Info("Document indexed")
 		}
 	}
 

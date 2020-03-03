@@ -2,17 +2,19 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	regions "github.com/mdelapenya/cansino/regions"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	fmt.Println("Soy un cansino!")
+	log.Println("Soy un cansino!")
 
 	err := regions.ProcessCLM(context.Background())
 	if err != nil {
-		fmt.Println(err)
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Error("Error processing Agenda CLM")
 		return
 	}
 }
