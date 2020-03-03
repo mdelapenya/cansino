@@ -43,7 +43,7 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 	apmHTTPClient := apmhttp.WrapClient(http.DefaultClient)
 	c.SetClient(apmHTTPClient)
 
-	c.OnHTML(a.HTMLSelector, a.process)
+	c.OnHTML(a.HTMLSelector, a.htmlProcess)
 
 	// Before making a request print "Visiting ..."
 	c.OnRequest(func(r *colly.Request) {
@@ -69,7 +69,7 @@ func (a *Agenda) ToJSON() ([]byte, error) {
 	return json.Marshal(a)
 }
 
-func (a *Agenda) process(e *colly.HTMLElement) {
+func (a *Agenda) htmlProcess(e *colly.HTMLElement) {
 	a.HTMLProcessor(a, e)
 }
 
