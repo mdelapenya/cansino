@@ -1,16 +1,13 @@
 package regions
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/mdelapenya/cansino/indexers"
 	models "github.com/mdelapenya/cansino/models"
-	log "github.com/sirupsen/logrus"
 )
 
 const clmClass = "agenda evento"
@@ -23,7 +20,8 @@ var currentStartDate = models.AgendaDate{
 	Day: 8, Month: 7, Year: 2019,
 }
 
-var historicalStartDate = models.AgendaDate{
+// HistoricalStartDate the date the region starts
+var HistoricalStartDate = models.AgendaDate{
 	Day: 1, Month: 2, Year: 2017,
 }
 
@@ -65,44 +63,6 @@ func NewAgendaCLM(day int, month int, year int) *models.Agenda {
 	}
 
 	return agendaCLM
-}
-
-// ProcessCLM processes all entities from the beginning to the end
-func ProcessCLM(ctx context.Context) error {
-	start := historicalStartDate.ToDate()
-	end := time.Now()
-
-	for rd := rangeDate(start, end); ; {
-		date := rd()
-		if date.IsZero() {
-			break
-		}
-
-		clm := NewAgendaCLM(date.Day(), int(date.Month()), date.Year())
-
-		processAgenda(context.Background(), clm)
-	}
-
-	return nil
-}
-
-func processAgenda(ctx context.Context, a *models.Agenda) error {
-	a.Scrap(context.Background())
-
-	indexer, _ := indexers.GetIndexer("elasticsearch")
-	for _, event := range a.Events {
-		err := indexer.Index(context.Background(), event)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"agendaID": a.ID,
-				"date":     a.Date,
-				"error":    err,
-			}).Errorf("error indexing event")
-			return err
-		}
-	}
-
-	return nil
 }
 
 func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
