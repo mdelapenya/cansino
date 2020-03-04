@@ -59,12 +59,16 @@ var getCmd = &cobra.Command{
 	Short: "Gets an agenda",
 	Long:  "Performs the scrapping and indexing of an agenda, identified by the region and day",
 	Run: func(cmd *cobra.Command, args []string) {
-		layout := "2006-01-02"
-		t, err := time.Parse(layout, date)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"date": date,
-			}).Fatal("Wrong date format. Please use yyyy-MM-dd")
+		t := time.Now()
+		if date != "Today" {
+			layout := "2006-01-02"
+			parsedDate, err := time.Parse(layout, date)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"date": date,
+				}).Fatal("Wrong date format. Please use yyyy-MM-dd")
+			}
+			t = parsedDate
 		}
 
 		clm := regions.NewAgendaCLM(t.Day(), int(t.Month()), t.Year())

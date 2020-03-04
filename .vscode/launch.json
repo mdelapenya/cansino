@@ -14,13 +14,22 @@
             "args": ["chase"]
         },
         {
-            "name": "One day",
+            "name": "Get One day",
             "type": "go",
             "request": "launch",
             "mode": "auto",
             "program": "${workspaceFolder}",
             "envFile": "${workspaceFolder}/docker/.env",
-            "args": ["get", "-d", "2020-03-04"]
+            "args": ["get", "-d", "2020-01-04"]
+        },
+        {
+            "name": "Get Today",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}",
+            "envFile": "${workspaceFolder}/docker/.env",
+            "args": ["get", "-d", "Today"]
         }
     ]
 }
