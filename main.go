@@ -3,20 +3,14 @@ package main
 import (
 	"context"
 
-	regions "github.com/mdelapenya/cansino/regions"
+	"github.com/mdelapenya/cansino/cmd"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	log.Println("Soy un cansino!")
 
-	err := regions.ProcessCLM(context.Background())
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err,
-		}).Error("Error processing Agenda CLM")
-		return
-	}
+	cmd.Execute()
 }
 
 // Scrapper methods required to scrap a site
