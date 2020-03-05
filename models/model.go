@@ -21,6 +21,7 @@ type Agenda struct {
 	HTMLProcessor  func(a *Agenda, e *colly.HTMLElement) `json:"-"`
 	ID             string                                `json:"id"`
 	Owner          string                                `json:"owner"`
+	Region         string                                `json:"-"`
 	URL            string                                `json:"url"`
 	URLFormat      string                                `json:"-"`
 }
@@ -116,4 +117,10 @@ func (ae *AgendaEvent) ToJSON() ([]byte, error) {
 type Attendee struct {
 	Job      string `json:"job"`
 	FullName string `json:"fullName"`
+}
+
+// Region represents a region
+type Region struct {
+	Name      string
+	StartDate AgendaDate // when the agenda started to share agendas publicly
 }

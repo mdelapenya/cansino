@@ -13,11 +13,28 @@ import (
 
 var date string
 
+var availableRegionNames = []string{
+	"Castilla-La Mancha",
+}
+
+var availableRegions = map[string]*models.Region{}
+
 func init() {
 	getCmd.Flags().StringVarP(&date, "date", "d", "Today", "Sets the date to be run (yyyy-MM-dd)")
 
 	rootCmd.AddCommand(chaseCmd)
 	rootCmd.AddCommand(getCmd)
+
+	for _, regionName := range availableRegionNames {
+		region, err := regions.RegionFactory(regionName)
+		if err != nil {
+			log.WithFields(log.Fields{
+				"error":  err,
+				"region": regionName,
+			}).Fatal("Cannot initialise regions")
+		}
+		availableRegions[regionName] = region
+	}
 }
 
 var rootCmd = &cobra.Command{
@@ -44,12 +61,15 @@ var chaseCmd = &cobra.Command{
 	Short: "Gets all agendas",
 	Long:  "Performs the scrapping and indexing of all agendas",
 	Run: func(cmd *cobra.Command, args []string) {
-		err := processRegion(context.Background())
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err,
-			}).Error("Error processing Agenda CLM")
-			return
+		for _, region := range availableRegions {
+			err := processRegion(context.Background(), region)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error":  err,
+					"region": region,
+				}).Error("Error processing Agenda")
+				return
+			}
 		}
 	},
 }
@@ -71,22 +91,33 @@ var getCmd = &cobra.Command{
 			t = parsedDate
 		}
 
-		clm := regions.NewAgendaCLM(t.Day(), int(t.Month()), t.Year())
-
-		processAgenda(context.Background(), clm)
+		for _, region := range availableRegions {
+			err := processAgenda(context.Background(), region, t.Day(), int(t.Month()), t.Year())
+			if err != nil {
+				log.WithFields(log.Fields{
+					"date":   date,
+					"region": region,
+				}).Fatal("Error retrieving the agenda for one day")
+			}
+		}
 	},
 }
 
-func processAgenda(ctx context.Context, a *models.Agenda) error {
-	a.Scrap(context.Background())
+func processAgenda(ctx context.Context, region *models.Region, day int, month int, year int) error {
+	agenda, err := regions.AgendaFactory(region, day, month, year)
+	if err != nil {
+		return err
+	}
+
+	agenda.Scrap(context.Background())
 
 	indexer, _ := indexers.GetIndexer("elasticsearch")
-	for _, event := range a.Events {
+	for _, event := range agenda.Events {
 		err := indexer.Index(context.Background(), event)
 		if err != nil {
 			log.WithFields(log.Fields{
-				"agendaID": a.ID,
-				"date":     a.Date,
+				"agendaID": agenda.ID,
+				"date":     agenda.Date,
 				"error":    err,
 			}).Errorf("error indexing event")
 			return err
@@ -96,9 +127,9 @@ func processAgenda(ctx context.Context, a *models.Agenda) error {
 	return nil
 }
 
-// processRegion processes all entities from the beginning to the end
-func processRegion(ctx context.Context) error {
-	start := regions.HistoricalStartDate.ToDate()
+// processRegion processes all entities for a region, from the beginning to the end
+func processRegion(ctx context.Context, region *models.Region) error {
+	start := region.StartDate.ToDate()
 	end := time.Now()
 
 	for rd := regions.RangeDate(start, end); ; {
@@ -107,9 +138,10 @@ func processRegion(ctx context.Context) error {
 			break
 		}
 
-		clm := regions.NewAgendaCLM(date.Day(), int(date.Month()), date.Year())
-
-		processAgenda(context.Background(), clm)
+		err := processAgenda(context.Background(), region, date.Day(), int(date.Month()), date.Year())
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

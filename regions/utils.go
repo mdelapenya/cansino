@@ -1,8 +1,29 @@
 package regions
 
 import (
+	"errors"
 	"time"
+
+	"github.com/mdelapenya/cansino/models"
 )
+
+// AgendaFactory returns an agenda object based on its name
+func AgendaFactory(region *models.Region, day int, month int, year int) (*models.Agenda, error) {
+	if region.Name == "Castilla-La Mancha" {
+		return NewAgendaCLM(region, day, month, year), nil
+	}
+
+	return &models.Agenda{}, errors.New("No such region")
+}
+
+// RegionFactory returns a region based on its name
+func RegionFactory(name string) (*models.Region, error) {
+	if name == "Castilla-La Mancha" {
+		return CLM(), nil
+	}
+
+	return &models.Region{}, errors.New("No such region")
+}
 
 // RangeDate returns a date range function over start date to end date inclusive.
 // After the end of the range, the range function returns a zero date,

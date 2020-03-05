@@ -12,33 +12,40 @@ import (
 
 const clmClass = "agenda evento"
 
-const currentEventsURL = "https://transparencia.castillalamancha.es/agenda/198?date_filter[value][date]=%02d/%02d/%04d"
+const clmCurrentEventsURL = "https://transparencia.castillalamancha.es/agenda/198?date_filter[value][date]=%02d/%02d/%04d"
 
-const pastEventsURL = "https://transparencia.castillalamancha.es/agenda-historico/198?date_filter[value][date]=%02d/%02d/%04d"
+const clmPastEventsURL = "https://transparencia.castillalamancha.es/agenda-historico/198?date_filter[value][date]=%02d/%02d/%04d"
 
-var currentStartDate = models.AgendaDate{
+var clmCurrentStartDate = models.AgendaDate{
 	Day: 8, Month: 7, Year: 2019,
 }
 
-// HistoricalStartDate the date the region starts
-var HistoricalStartDate = models.AgendaDate{
+var clmHistoricalStartDate = models.AgendaDate{
 	Day: 1, Month: 2, Year: 2017,
 }
 
-var historicalEndDate = models.AgendaDate{
+var clmHistoricalEndDate = models.AgendaDate{
 	Day: 7, Month: 7, Year: 2019,
 }
 
+// CLM returns the CLM region
+func CLM() *models.Region {
+	return &models.Region{
+		Name:      "Castilla-La Mancha",
+		StartDate: clmHistoricalStartDate,
+	}
+}
+
 // NewAgendaCLM represents the agenda for Castilla-la Mancha
-func NewAgendaCLM(day int, month int, year int) *models.Agenda {
+func NewAgendaCLM(region *models.Region, day int, month int, year int) *models.Agenda {
 	agendaDate := models.AgendaDate{
 		Day: day, Month: month, Year: year,
 	}
 
-	agendaURL := pastEventsURL
+	agendaURL := clmPastEventsURL
 	cssSelector := "div.agenda-historico div div ul"
-	if agendaDate.ToDate().After(historicalEndDate.ToDate()) {
-		agendaURL = currentEventsURL
+	if agendaDate.ToDate().After(clmHistoricalEndDate.ToDate()) {
+		agendaURL = clmCurrentEventsURL
 		cssSelector = "div.view-agenda div div ul"
 	}
 
@@ -57,8 +64,9 @@ func NewAgendaCLM(day int, month int, year int) *models.Agenda {
 		Date:           dateTime,
 		Day:            agendaDate,
 		Events:         []models.AgendaEvent{},
-		ID:             dateTime.Local().Format("2006-01-02"),
+		ID:             "clm-" + dateTime.Local().Format("2006-01-02"),
 		Owner:          "Presidente",
+		Region:         region.Name,
 		URL:            fmt.Sprintf(agendaURL, agendaDate.Day, agendaDate.Month, agendaDate.Year),
 	}
 
@@ -73,7 +81,7 @@ func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
 				event = models.AgendaEvent{
 					Attendance: []models.Attendee{},
 					Owner:      a.Owner,
-					Region:     "Castilla-La Mancha",
+					Region:     a.Region,
 				}
 			} else if index == 1 {
 				description := li.Text
