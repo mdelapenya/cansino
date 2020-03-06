@@ -182,7 +182,10 @@ func (ei *ElasticsearchIndexer) Index(ctx context.Context, event models.AgendaEv
 }
 
 func getBody(text string) string {
-	return `{"analyzer": "spanish_stop", "text": "` + strings.ReplaceAll(text, `"`, `\"`) + `"}`
+	text = strings.ReplaceAll(text, `"`, `\"`)
+	text = strings.ReplaceAll(text, "\n", "")
+
+	return `{"analyzer": "spanish_stop", "text": "` + text + `"}`
 }
 
 // getElasticsearchClient returns a client connected to the running elasticseach cluster
