@@ -11,6 +11,8 @@ import (
 func AgendaFactory(region *models.Region, day int, month int, year int) (*models.Agenda, error) {
 	if region.Name == "Castilla-La Mancha" {
 		return NewAgendaCLM(region, day, month, year), nil
+	} else if region.Name == "Madrid" {
+		return NewAgendaMadrid(region, day, month, year), nil
 	}
 
 	return &models.Agenda{}, errors.New("No such region")
@@ -20,6 +22,8 @@ func AgendaFactory(region *models.Region, day int, month int, year int) (*models
 func RegionFactory(name string) (*models.Region, error) {
 	if name == "Castilla-La Mancha" {
 		return CLM(), nil
+	} else if name == "Madrid" {
+		return Madrid(), nil
 	}
 
 	return &models.Region{}, errors.New("No such region")

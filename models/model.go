@@ -13,17 +13,22 @@ import (
 
 // Agenda represents an agenda for a day
 type Agenda struct {
-	AllowedDomains []string                              `json:"-"`
-	Date           time.Time                             `json:"date"`
-	Day            AgendaDate                            `json:"day"`
-	Events         []AgendaEvent                         `json:"events"`
-	HTMLSelector   string                                `json:"-"`
-	HTMLProcessor  func(a *Agenda, e *colly.HTMLElement) `json:"-"`
-	ID             string                                `json:"id"`
-	Owner          string                                `json:"owner"`
-	Region         string                                `json:"-"`
-	URL            string                                `json:"url"`
-	URLFormat      string                                `json:"-"`
+	AllowedDomains []string   `json:"-"`
+	Date           time.Time  `json:"date"`
+	Day            AgendaDate `json:"day"`
+	// DoPost: if the public agenda requires POST http method
+	DoPost        bool                                  `json:"-"`
+	Events        []AgendaEvent                         `json:"events"`
+	HTMLSelector  string                                `json:"-"`
+	HTMLProcessor func(a *Agenda, e *colly.HTMLElement) `json:"-"`
+	// JSONProcessor only for processing POST requests
+	JSONProcessor func(a *Agenda, body []byte) `json:"-"`
+	ID            string                       `json:"id"`
+	Owner         string                       `json:"owner"`
+	Region        string                       `json:"-"`
+	Payload       string                       `json:"-"`
+	URL           string                       `json:"url"`
+	URLFormat     string                       `json:"-"`
 }
 
 // Scrap scrappes an agenda
@@ -44,11 +49,14 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 	apmHTTPClient := apmhttp.WrapClient(http.DefaultClient)
 	c.SetClient(apmHTTPClient)
 
-	c.OnHTML(a.HTMLSelector, a.htmlProcess)
-
 	// Before making a request print "Visiting ..."
 	c.OnRequest(func(r *colly.Request) {
-		r.Ctx.Put("url", r.URL.String())
+		if a.DoPost {
+			r.Headers.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+		} else {
+			r.Ctx.Put("url", r.URL.String())
+		}
+
 		log.WithFields(log.Fields{
 			"url": r.URL.String(),
 		}).Debug("Visiting url")
@@ -63,7 +71,18 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 		}).Error("Failed to parse HTML")
 	})
 
-	err := c.Visit(a.URL)
+	var err error
+	if a.DoPost {
+		c.OnResponse(func(r *colly.Response) {
+			a.JSONProcessor(a, r.Body)
+		})
+
+		err = c.PostRaw(a.URL, []byte(a.Payload))
+	} else {
+		c.OnHTML(a.HTMLSelector, a.htmlProcess)
+
+		err = c.Visit(a.URL)
+	}
 	if err != nil {
 		log.WithFields(log.Fields{
 			"url":   a.URL,
@@ -122,5 +141,6 @@ type Attendee struct {
 // Region represents a region
 type Region struct {
 	Name      string
+	DoPost    bool
 	StartDate AgendaDate // when the agenda started to share agendas publicly
 }

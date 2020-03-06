@@ -32,6 +32,7 @@ var clmHistoricalEndDate = models.AgendaDate{
 func CLM() *models.Region {
 	return &models.Region{
 		Name:      "Castilla-La Mancha",
+		DoPost:    false,
 		StartDate: clmHistoricalStartDate,
 	}
 }
@@ -63,6 +64,7 @@ func NewAgendaCLM(region *models.Region, day int, month int, year int) *models.A
 		URLFormat:      agendaURL,
 		Date:           dateTime,
 		Day:            agendaDate,
+		DoPost:         region.DoPost,
 		Events:         []models.AgendaEvent{},
 		ID:             "clm-" + dateTime.Local().Format("2006-01-02"),
 		Owner:          "Presidente",
@@ -147,7 +149,7 @@ func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
 				// discard LI
 			}
 		})
-		event.ID = event.Date.Local().Format("2006-01-02T15:04:05-0700")
+		event.ID = "clm-" + event.Date.Local().Format("2006-01-02T15:04:05-0700")
 		a.Events = append(a.Events, event)
 	}
 }

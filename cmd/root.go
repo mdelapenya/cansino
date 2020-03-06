@@ -14,7 +14,7 @@ import (
 var date string
 
 var availableRegionNames = []string{
-	"Castilla-La Mancha",
+	"Castilla-La Mancha", "Madrid",
 }
 
 var availableRegions = map[string]*models.Region{}
