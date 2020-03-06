@@ -43,7 +43,7 @@ func NewAgendaMadrid(region *models.Region, day int, month int, year int) *model
 		0, 0, 0, 0, loc,
 	)
 
-	agendaCLM := &models.Agenda{
+	agendaMadrid := &models.Agenda{
 		AllowedDomains: []string{"www.comunidad.madrid"},
 		HTMLSelector:   cssSelector,
 		JSONProcessor:  madridProcessor,
@@ -59,7 +59,7 @@ func NewAgendaMadrid(region *models.Region, day int, month int, year int) *model
 		URL:            agendaURL,
 	}
 
-	return agendaCLM
+	return agendaMadrid
 }
 
 type madridResult struct {
