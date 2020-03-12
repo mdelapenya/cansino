@@ -8,9 +8,11 @@ import (
 )
 
 func main() {
-	log.Println("Soy un cansino!")
+	log.Info("Soy un cansino!")
 
 	cmd.Execute()
+
+	log.Info("Ya me he cansado 😴")
 }
 
 // Scrapper methods required to scrap a site
