@@ -16,7 +16,7 @@ Cansino is a program written in Go, processing each agenda's events and sending 
 
 The Go code is instrumented with [Elastic's APM Go Agent](https://www.elastic.co/guide/en/apm/agent/go/master/index.html), creating traces each time a document is indexed.
 
-The execution flow is defined by a CLI, having two main commands:
+The execution flow is defined by a CLI, written with [Cobra](https://github.com/spf13/cobra), having two main commands:
 
 - `chase`, which will process all events in all the agendas
 - `get [-d|--date 2020-04-14]`, which will process all events in all agendas in a specific day. If the date is equals to the string "Today", then it will use _Now()_.
