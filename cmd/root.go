@@ -12,6 +12,7 @@ import (
 )
 
 var date string
+var regionParam string
 
 var availableRegionNames = []string{
 	"Castilla-La Mancha", "Extremadura", "Madrid",
@@ -21,20 +22,10 @@ var availableRegions = map[string]*models.Region{}
 
 func init() {
 	getCmd.Flags().StringVarP(&date, "date", "d", "Today", "Sets the date to be run (yyyy-MM-dd)")
+	getCmd.Flags().StringVarP(&regionParam, "region", "r", "all", "Sets the region to be run")
 
 	rootCmd.AddCommand(chaseCmd)
 	rootCmd.AddCommand(getCmd)
-
-	for _, regionName := range availableRegionNames {
-		region, err := regions.RegionFactory(regionName)
-		if err != nil {
-			log.WithFields(log.Fields{
-				"error":  err,
-				"region": regionName,
-			}).Fatal("Cannot initialise regions")
-		}
-		availableRegions[regionName] = region
-	}
 }
 
 var rootCmd = &cobra.Command{
@@ -91,6 +82,35 @@ var getCmd = &cobra.Command{
 			t = parsedDate
 		}
 
+		if regionParam != "all" {
+			if !contains(availableRegionNames, regionParam) {
+				log.WithFields(log.Fields{
+					"region":    regionParam,
+					"available": availableRegionNames,
+				}).Fatal("Region not supported.")
+			}
+
+			region, err := regions.RegionFactory(regionParam)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error":  err,
+					"region": regionParam,
+				}).Fatal("Cannot initialise region")
+			}
+			availableRegions[regionParam] = region
+		} else {
+			for _, regionName := range availableRegionNames {
+				region, err := regions.RegionFactory(regionName)
+				if err != nil {
+					log.WithFields(log.Fields{
+						"error":  err,
+						"region": regionName,
+					}).Fatal("Cannot initialise regions")
+				}
+				availableRegions[regionName] = region
+			}
+		}
+
 		for _, region := range availableRegions {
 			err := processAgenda(context.Background(), region, t.Day(), int(t.Month()), t.Year())
 			if err != nil {
@@ -103,7 +123,23 @@ var getCmd = &cobra.Command{
 	},
 }
 
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 func processAgenda(ctx context.Context, region *models.Region, day int, month int, year int) error {
+	log.WithFields(log.Fields{
+		"day":    day,
+		"month":  month,
+		"year":   year,
+		"region": region.Name,
+	}).Info("Processing agenda")
+
 	agenda, err := regions.AgendaFactory(region, day, month, year)
 	if err != nil {
 		return err
