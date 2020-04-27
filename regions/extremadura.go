@@ -69,7 +69,7 @@ func juntaExtremaduraProcessor(a *models.Agenda, e *colly.HTMLElement) {
 				Region:     a.Region,
 			}
 
-			blockquote.ForEach("div.eventHeading", func(index int, headerDiv *colly.HTMLElement) {
+			processHeading := func(index int, headerDiv *colly.HTMLElement) {
 				header := headerDiv.Text
 				header = strings.ReplaceAll(header, "\t", "")
 				header = strings.ReplaceAll(header, "\n", "")
@@ -96,6 +96,14 @@ func juntaExtremaduraProcessor(a *models.Agenda, e *colly.HTMLElement) {
 				)
 				event.Location = strings.TrimSpace(string(headerRunes[firstHyphen+1:]))
 				event.OriginalLocation = event.Location
+			}
+
+			// in 2020-03-22, for soome reason the HTML markup changes
+			blockquote.ForEach("div.eventHeading", func(index int, headerDiv *colly.HTMLElement) {
+				processHeading(index, headerDiv)
+			})
+			blockquote.ForEach("p.eventHeading", func(index int, headerDiv *colly.HTMLElement) {
+				processHeading(index, headerDiv)
 			})
 
 			blockquote.ForEach("div.eventShortDescription p", func(index int, descriptionDiv *colly.HTMLElement) {
