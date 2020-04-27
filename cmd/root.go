@@ -82,33 +82,20 @@ var getCmd = &cobra.Command{
 			t = parsedDate
 		}
 
+		regionNames := availableRegionNames
 		if regionParam != "all" {
-			if !contains(availableRegionNames, regionParam) {
-				log.WithFields(log.Fields{
-					"region":    regionParam,
-					"available": availableRegionNames,
-				}).Fatal("Region not supported.")
-			}
+			regionNames = []string{regionParam}
+		}
 
-			region, err := regions.RegionFactory(regionParam)
+		for _, regionName := range regionNames {
+			region, err := regions.RegionFactory(regionName)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"error":  err,
-					"region": regionParam,
-				}).Fatal("Cannot initialise region")
+					"region": regionName,
+				}).Fatal("Cannot initialise regions")
 			}
-			availableRegions[regionParam] = region
-		} else {
-			for _, regionName := range availableRegionNames {
-				region, err := regions.RegionFactory(regionName)
-				if err != nil {
-					log.WithFields(log.Fields{
-						"error":  err,
-						"region": regionName,
-					}).Fatal("Cannot initialise regions")
-				}
-				availableRegions[regionName] = region
-			}
+			availableRegions[regionName] = region
 		}
 
 		for _, region := range availableRegions {
