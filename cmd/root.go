@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var date string
+var dateParam string
 var regionParam string
 
 var availableRegionNames = []string{
@@ -21,7 +21,7 @@ var availableRegionNames = []string{
 var availableRegions = map[string]*models.Region{}
 
 func init() {
-	getCmd.Flags().StringVarP(&date, "date", "d", "Today", "Sets the date to be run (yyyy-MM-dd)")
+	getCmd.Flags().StringVarP(&dateParam, "date", "d", "Today", "Sets the date to be run (yyyy-MM-dd)")
 	getCmd.Flags().StringVarP(&regionParam, "region", "r", "all", "Sets the region to be run")
 
 	rootCmd.AddCommand(chaseCmd)
@@ -71,12 +71,12 @@ var getCmd = &cobra.Command{
 	Long:  "Performs the scrapping and indexing of an agenda, identified by the region and day",
 	Run: func(cmd *cobra.Command, args []string) {
 		t := time.Now()
-		if date != "Today" {
+		if dateParam != "Today" {
 			layout := "2006-01-02"
-			parsedDate, err := time.Parse(layout, date)
+			parsedDate, err := time.Parse(layout, dateParam)
 			if err != nil {
 				log.WithFields(log.Fields{
-					"date": date,
+					"date": dateParam,
 				}).Fatal("Wrong date format. Please use yyyy-MM-dd")
 			}
 			t = parsedDate
@@ -115,7 +115,7 @@ var getCmd = &cobra.Command{
 			err := processAgenda(context.Background(), region, t.Day(), int(t.Month()), t.Year())
 			if err != nil {
 				log.WithFields(log.Fields{
-					"date":   date,
+					"date":   dateParam,
 					"region": region,
 				}).Fatal("Error retrieving the agenda for one day")
 			}
