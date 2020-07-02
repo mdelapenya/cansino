@@ -21,6 +21,7 @@ The Go code is instrumented with [Elastic's APM Go Agent](https://www.elastic.co
 The execution flow is defined by a CLI, written with [Cobra](https://github.com/spf13/cobra), having two main commands:
 
 - `chase`, which will process all events in all the agendas
+- `chase [-r|--region "Madrid"]`, which will process all events in all agendas for an specific region.
 - `get [-d|--date 2020-04-14]`, which will process all events in all agendas in a specific day. If the date is equals to the string "Today", then it will use _Now()_.
 - `get [-r|--region "Madrid"]`, which will process all events in all agendas for an specific region. If the region is not supported by the tool (_see bellow_), the program will abort. If the region is equals to `"all"`, then all supported regions will be processed.
 
@@ -39,6 +40,7 @@ These are the regions indexed by Cansino.
     - Castilla-La Mancha (my region!)
     - Extremadura
     - Madrid
+    - Castilla-León
 
 ## Access to the dashboards
 Would you like to access a dashboard? Send me an email to `mdelapenya at gmail.com`.
