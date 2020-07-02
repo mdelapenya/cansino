@@ -1,5 +1,7 @@
 ![Today's agendas](https://github.com/mdelapenya/cansino/workflows/Cansino%20Daily/badge.svg?branch=master)
 
+[Blog post (in Spanish)](https://gdgtoledo.github.io/web/posts/2020-04-16-cansino/)
+
 # Cansino
 Sometimes politicians talk a lot about what they say it's important for the citizens, and many times we don't find them not doing what they say.
 
