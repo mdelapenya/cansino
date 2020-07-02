@@ -24,6 +24,8 @@ func init() {
 	getCmd.Flags().StringVarP(&dateParam, "date", "d", "Today", "Sets the date to be run (yyyy-MM-dd)")
 	getCmd.Flags().StringVarP(&regionParam, "region", "r", "all", "Sets the region to be run")
 
+	chaseCmd.Flags().StringVarP(&regionParam, "region", "r", "all", "Sets the region to be run")
+
 	rootCmd.AddCommand(chaseCmd)
 	rootCmd.AddCommand(getCmd)
 }
@@ -52,6 +54,22 @@ var chaseCmd = &cobra.Command{
 	Short: "Gets all agendas",
 	Long:  "Performs the scrapping and indexing of all agendas",
 	Run: func(cmd *cobra.Command, args []string) {
+		regionNames := availableRegionNames
+		if regionParam != "all" {
+			regionNames = []string{regionParam}
+		}
+
+		for _, regionName := range regionNames {
+			region, err := regions.RegionFactory(regionName)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error":  err,
+					"region": regionName,
+				}).Fatal("Cannot initialise regions")
+			}
+			availableRegions[regionName] = region
+		}
+
 		for _, region := range availableRegions {
 			err := processRegion(context.Background(), region)
 			if err != nil {
