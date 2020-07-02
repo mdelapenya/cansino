@@ -15,7 +15,7 @@ var dateParam string
 var regionParam string
 
 var availableRegionNames = []string{
-	"Castilla-La Mancha", "Extremadura", "Madrid",
+	"Castilla-La Mancha", "Castilla-León", "Extremadura", "Madrid",
 }
 
 var availableRegions = map[string]*models.Region{}
