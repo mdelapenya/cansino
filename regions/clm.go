@@ -76,7 +76,7 @@ func NewAgendaCLM(region *models.Region, day int, month int, year int) *models.A
 }
 
 func clmProcessor(a *models.Agenda, e *colly.HTMLElement) {
-	if clmClass == strings.TrimSpace(e.Attr("class")) {
+	if strings.Contains(strings.TrimSpace(e.Attr("class")), clmClass) {
 		var event models.AgendaEvent
 		e.ForEach("li", func(index int, li *colly.HTMLElement) {
 			if "cargo" == strings.TrimSpace(li.Attr("class")) {
