@@ -71,7 +71,7 @@ var chaseCmd = &cobra.Command{
 		}
 
 		for _, region := range availableRegions {
-			err := processRegion(context.Background(), region)
+			err := processRegion(context.Background(), region, region.StartDate.ToDate())
 			if err != nil {
 				log.WithFields(log.Fields{
 					"error":  err,
@@ -161,9 +161,8 @@ func processAgenda(ctx context.Context, region *models.Region, day int, month in
 	return nil
 }
 
-// processRegion processes all entities for a region, from the beginning to the end
-func processRegion(ctx context.Context, region *models.Region) error {
-	start := region.StartDate.ToDate()
+// processRegion processes all entities for a region, from an initial date to now
+func processRegion(ctx context.Context, region *models.Region, start time.Time) error {
 	end := time.Now()
 
 	for rd := regions.RangeDate(start, end); ; {
