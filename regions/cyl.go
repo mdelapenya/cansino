@@ -10,7 +10,7 @@ import (
 	models "github.com/mdelapenya/cansino/models"
 )
 
-const cylEventsURL = "https://comunicacion.jcyl.es/web/jcyl/Comunicacion/es/PlantillaCalendarioBuscadorComponente/1284877983791/_/_/_?param[0]=%04d&param[1]=%02d&param[2]%02d&parametro2=1281372093473&parametro3=1284233390583"
+const cylEventsURL = "https://comunicacion.jcyl.es/web/jcyl/Comunicacion/es/PlantillaCalendarioBuscadorComponente/1284877983791/_/_/_?param[0]=%04d&param[1]=%02d&param[2]=%02d&parametro2=1281372093473&parametro3=1284233390583"
 
 var juntaCYLStartDate = models.AgendaDate{
 	Day: 21, Month: 11, Year: 2012,
