@@ -90,14 +90,7 @@ var getCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		t := time.Now()
 		if dateParam != "Today" {
-			layout := "2006-01-02"
-			parsedDate, err := time.Parse(layout, dateParam)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"date": dateParam,
-				}).Fatal("Wrong date format. Please use yyyy-MM-dd")
-			}
-			t = parsedDate
+			t = toDate(dateParam)
 		}
 
 		regionNames := availableRegionNames
@@ -186,4 +179,16 @@ func processRegion(ctx context.Context, region *models.Region) error {
 	}
 
 	return nil
+}
+
+func toDate(str string) time.Time {
+	layout := "2006-01-02"
+	parsedDate, err := time.Parse(layout, str)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"date":  dateParam,
+			"error": err,
+		}).Fatal("Wrong date format. Please use yyyy-MM-dd")
+	}
+	return parsedDate
 }
