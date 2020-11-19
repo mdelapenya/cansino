@@ -25,8 +25,8 @@ type analysedToken struct {
 	Token       string `json:"token"`
 	StartOffset int    `json:"start_offset"`
 	EndOffset   int    `json:"end_offset"`
-	Word        string `json:"word"`
-	Position    int    `json:"posistion"`
+	Type        string `json:"type"`
+	Position    int    `json:"position"`
 }
 
 type analysedResponse map[string][]analysedToken
