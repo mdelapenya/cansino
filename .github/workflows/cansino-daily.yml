@@ -16,7 +16,7 @@ jobs:
       with:
         go-version: '^1.13.4' # The Go version to download (if necessary) and use.
     - name: Scrap today
-      run: go run main.go get -d Today
+      run: go run main.go get --since Today
       env:
         ELASTIC_CLOUD_AUTH: ${{ secrets.ELASTIC_CLOUD_AUTH }}
         ELASTIC_CLOUD_ID: ${{ secrets.ELASTIC_CLOUD_ID }}

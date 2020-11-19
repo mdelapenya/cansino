@@ -21,7 +21,7 @@ var availableRegionNames = []string{
 var availableRegions = map[string]*models.Region{}
 
 func init() {
-	getCmd.Flags().StringVarP(&dateParam, "date", "d", "Today", "Sets the date to be run (yyyy-MM-dd)")
+	getCmd.Flags().StringVarP(&dateParam, "since", "s", "Today", "Sets the date since to be run (yyyy-MM-dd)")
 	getCmd.Flags().StringVarP(&regionParam, "region", "r", "all", "Sets the region to be run")
 
 	chaseCmd.Flags().StringVarP(&regionParam, "region", "r", "all", "Sets the region to be run")
@@ -110,12 +110,12 @@ var getCmd = &cobra.Command{
 		}
 
 		for _, region := range availableRegions {
-			err := processAgenda(context.Background(), region, t.Day(), int(t.Month()), t.Year())
+			err := processRegion(context.Background(), region, t)
 			if err != nil {
 				log.WithFields(log.Fields{
-					"date":   dateParam,
-					"region": region,
-				}).Fatal("Error retrieving the agenda for one day")
+					"dateSince": dateParam,
+					"region":    region,
+				}).Fatal("Error retrieving the agenda for the region")
 			}
 		}
 	},

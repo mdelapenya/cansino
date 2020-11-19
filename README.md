@@ -22,7 +22,7 @@ The execution flow is defined by a CLI, written with [Cobra](https://github.com/
 
 - `chase`, which will process all events in all the agendas
 - `chase [-r|--region "Madrid"]`, which will process all events in all agendas for an specific region.
-- `get [-d|--date 2020-04-14]`, which will process all events in all agendas in a specific day. If the date is equals to the string "Today", then it will use _Now()_.
+- `get [-s|--since 2020-04-14]`, which will process all events in all agendas since the specific day. If the date is equals to the string "Today", then it will use _Now()_.
 - `get [-r|--region "Madrid"]`, which will process all events in all agendas for an specific region. If the region is not supported by the tool (_see bellow_), the program will abort. If the region is equals to `"all"`, then all supported regions will be processed.
 
 The Elasticsearch index is defined in the `index.json` file, which includes fields and the Spanish and Stop words analyzers, which are used to keep only the words of interest.
