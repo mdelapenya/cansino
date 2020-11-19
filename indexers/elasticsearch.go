@@ -184,6 +184,8 @@ func (ei *ElasticsearchIndexer) Index(ctx context.Context, event models.AgendaEv
 func getBody(text string) string {
 	text = strings.ReplaceAll(text, `"`, `\"`)
 	text = strings.ReplaceAll(text, "\n", "")
+	text = strings.ReplaceAll(text, "\t", "")
+	text = strings.ReplaceAll(text, "&npsp;", " ")
 
 	return `{"analyzer": "spanish_stop", "text": "` + text + `"}`
 }
