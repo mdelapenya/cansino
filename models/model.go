@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -143,4 +144,8 @@ type Region struct {
 	Name      string
 	DoPost    bool
 	StartDate AgendaDate // when the agenda started to share agendas publicly
+}
+
+func (r *Region) String() string {
+	return fmt.Sprintf("[Region: %s - Start Date: %v - Supports POST: %t]", r.Name, r.StartDate, r.DoPost)
 }

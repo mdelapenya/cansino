@@ -28,6 +28,7 @@ func init() {
 
 	rootCmd.AddCommand(chaseCmd)
 	rootCmd.AddCommand(getCmd)
+	rootCmd.AddCommand(listAgendasCmd)
 }
 
 var rootCmd = &cobra.Command{
@@ -117,6 +118,30 @@ var getCmd = &cobra.Command{
 					"region":    region,
 				}).Fatal("Error retrieving the agenda for the region")
 			}
+		}
+	},
+}
+
+var listAgendasCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List all agendas",
+	Long:  "List all agendas",
+	Run: func(cmd *cobra.Command, args []string) {
+		regionNames := availableRegionNames
+
+		for _, regionName := range regionNames {
+			region, err := regions.RegionFactory(regionName)
+			if err != nil {
+				log.WithFields(log.Fields{
+					"error":  err,
+					"region": regionName,
+				}).Fatal("Cannot initialise regions")
+			}
+			availableRegions[regionName] = region
+
+			log.WithFields(log.Fields{
+				"region": region,
+			}).Info("Supported agenda found")
 		}
 	},
 }
