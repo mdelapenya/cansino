@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -46,8 +47,14 @@ func (a *Agenda) Scrap(ctx context.Context) error {
 		colly.MaxDepth(1),
 	)
 
+	skipTlsClient := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+
 	// instrument Colly's HTTP requests with APM Agent Go
-	apmHTTPClient := apmhttp.WrapClient(http.DefaultClient)
+	apmHTTPClient := apmhttp.WrapClient(skipTlsClient)
 	c.SetClient(apmHTTPClient)
 
 	// Before making a request print "Visiting ..."
