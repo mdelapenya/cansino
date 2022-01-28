@@ -19,7 +19,7 @@ jobs:
       with:
         go-version: '^1.17' # The Go version to download (if necessary) and use.
     - name: Scrap today
-      run: go run main.go get --since Today --region ${{ matrix.region }}
+      run: go run main.go get --since Today --region "${{ matrix.region }}"
       env:
         ELASTIC_CLOUD_AUTH: ${{ secrets.ELASTIC_CLOUD_AUTH }}
         ELASTIC_CLOUD_ID: ${{ secrets.ELASTIC_CLOUD_ID }}
